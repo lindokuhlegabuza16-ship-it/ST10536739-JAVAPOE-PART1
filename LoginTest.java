@@ -7,6 +7,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
+import login.Message;
 
 
 
@@ -21,12 +23,11 @@ public class LoginTest {
     
     Login login;
     
-    public LoginTest() {
-    }
    
-    
     @BeforeClass
     public static void setUpClass() {
+    
+        
     }
     
     @AfterClass
@@ -36,13 +37,20 @@ public class LoginTest {
     @Before
     public void setUp() {
         login =new Login("Kyle", "Smith");
+        // Clear arrays before testing
+        login.sentMessages.clear();
+        login.disregardedMessages.clear();
+        login.storedMessages.clear();
+        login.messageIDs.clear();
+        login.messageHashes.clear();
     }
     
     @After
     public void tearDown() {
         login = null;
     }
-
+    
+    
    @Test
    public void testCheckUserName(){
            assertTrue("Valid username should return true",login.checkUserName("kyl_1"));
@@ -73,7 +81,8 @@ public class LoginTest {
        
        String invalidPass = login.registerUser("Kyl_1", "password", "+27838968976", "Kyle", "Smith");
        
-       assertEquals("Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter, a number, and a special character.", invalidPass);
+       assertEquals("Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter,"
+               + " a number, and a special character.", invalidPass);
        
        String invalidCell = login.registerUser("kyl_1", "Ch&&sec@ke99!","08966553", "Kyle", "Smith");
         
@@ -101,5 +110,24 @@ public class LoginTest {
        String fail = login.returnLoginStatus("wrong","wrongpass");
        
        assertEquals("Username or password incorrect, please try again.", fail);
+   }
+   
+      @Test
+   public void testSentMessagesArrayPopulated() {
+       // Manually create messages and set their flags to mock user actions
+       Message m1 = new Message(1, "+27834557896", "Did you get the cake?");
+       m1.sentMessage(1); // Flag as Sent
+       
+       Message m2 = new Message(4, "0838884567", "It is dinner time !");
+       m2.sentMessage(1);
+       
+       // Add to the array as the main program would
+       if (m1.getFlag().equals("Sent")) login.sentMessages.add(m1);
+       if (m2.getFlag().equals("Sent")) login.sentMessages.add(m2);
+       
+       // Test if the array contains the expected data
+       assertEquals(2, Login.sentMessages.size());
+       assertEquals("Did you get the cake?", Login.sentMessages.get(0).getMessageText());
+       assertEquals("It is dinner time !", Login.sentMessages.get(1).getMessageText());
    }
 }
